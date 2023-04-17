@@ -1,0 +1,37 @@
+# Define your GitHub repository information
+$owner = "your-github-username"
+$repo = "your-github-repo-name"
+$branch = "main"
+
+# Define your personal access token
+$token = "your-personal-access-token"
+
+# Define the path to your JSON file
+$file = "sessionhost_info.json"
+
+# Define the commit message
+$message = "Adding session host info file"
+
+# Define the API endpoint
+$url = "https://api.github.com/repos/$owner/$repo/contents/$file"
+
+# Convert the file content to Base64
+$content = Get-Content $file -Encoding UTF8
+$contentBytes = [System.Text.Encoding]::UTF8.GetBytes($content)
+$encodedContent = [System.Convert]::ToBase64String($contentBytes)
+
+# Define the body of the request
+$body = @{
+    message = $message
+    content = $encodedContent
+    branch = $branch
+} | ConvertTo-Json
+
+# Define the headers of the request
+$headers = @{
+    "Authorization" = "Bearer $token"
+    "Accept" = "application/vnd.github.v3+json"
+}
+
+# Make the request to create the file
+Invoke-RestMethod -Uri $url -Headers $headers -Method Put -Body $body
